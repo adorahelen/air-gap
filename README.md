@@ -51,3 +51,7 @@ rpl-udp/
 - Flooding 공격은, Application Layer에서 동작 
 - Copycat 등은 Network Layer에서 동작
 
+
+<img width="828" height="633" alt="image" src="https://github.com/user-attachments/assets/e35b4d79-c04f-40bd-8bb1-199adaf2afe5" />
+
+
