@@ -45,3 +45,9 @@ rpl-udp/
 | **DAO Dropping / DAO Insider** | 어려움 | **DAO** (Destination Advertisement Object)를 조작하거나 전송 중에 고의적으로 Drop | |
 | **Copycat Attack** | 보통 | 이웃 노드의 **DIO**를 도용하여 **Replay** (재전송) | |
 
+
+<img width="279" height="366" alt="image" src="https://github.com/user-attachments/assets/8f0c708c-6da5-44be-99b9-635760314165" />
+
+- Flooding 공격은, Application Layer에서 동작 
+- Copycat 등은 Network Layer에서 동작
+
