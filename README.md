@@ -32,8 +32,6 @@ rpl-udp/
 - 12 카테고리, 37개 공격 존재
 - 그중 Cooja에서 구현이 쉬운 공격들을 위주로 구현
 
-제공해 주신 RPL(Routing Protocol for Low-Power and Lossy Networks) 공격 유형을 Markdown 형식의 표로 정리했습니다.
-
 ### RPL 라우팅 프로토콜 공격 유형 요약
 
 | 공격 종류 | 난이도 | 구현 방식 | 논문 |
