@@ -30,4 +30,20 @@ rpl-udp/
 
 ## 공격 분류 
 - 12 카테고리, 37개 공격 존재
-- 그중 Cooja에서 구현이 쉬운 공격들을 위주로 구현 ㅇ
+- 그중 Cooja에서 구현이 쉬운 공격들을 위주로 구현
+
+제공해 주신 RPL(Routing Protocol for Low-Power and Lossy Networks) 공격 유형을 Markdown 형식의 표로 정리했습니다.
+
+### RPL 라우팅 프로토콜 공격 유형 요약
+
+| 공격 종류 | 난이도 | 구현 방식 | 논문 |
+| :--- | :--- | :--- | :--- |
+| **Rank Decrease Attack** | 쉬움 | 공격 노드가 **Rank**를 인위적으로 낮춰 광고하여 부모 노드가 되도록 유도 | |
+| **Sinkhole** | 쉬움 | 낮은 **Rank** 광고 + **Selective Forwarding** (선택적 포워딩)을 통해 트래픽 흡수 | |
+| **DIS Flooding** | 쉬움 | 네트워크 부하 유발을 위해 무한 **DIS** (DODAG Information Solicitation) 전송 | |
+| **Blackhole** | 쉬움 | 수신한 모든 데이터 **패킷을 Drop** (삭제) | |
+| **Grayhole** | 쉬움 | 수신한 데이터 **패킷을 일부만 Drop** (선택적으로 삭제) | |
+| **Version Number Attack** | 보통 | **DIO**에 **Version Number**를 급격히 증가시켜 전체 트리 리빌드 유발 | |
+| **DAO Dropping / DAO Insider** | 어려움 | **DAO** (Destination Advertisement Object)를 조작하거나 전송 중에 고의적으로 Drop | |
+| **Copycat Attack** | 보통 | 이웃 노드의 **DIO**를 도용하여 **Replay** (재전송) | |
+
